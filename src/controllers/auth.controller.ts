@@ -1,33 +1,30 @@
-import { RefreshToken } from "../models/RefreshToken";
-import { signAccessToken, signRefreshToken, hashToken } from "../utils/tokens";
+import { Request, Response } from "express";
+import { AuthService } from "../services/auth.service";
 
+export const register = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
 
-export const login = async ( req: Request, res: Response) => {
-    try{
-        const { email,password } = req.body;
+    const user = await AuthService.register(email, password);
+    return res.status(201).json(user);
+  } catch (err: any) {
+    if (err.message === "EMAIL_IN_USE") {
+      return res.status(400).json({ message: "Email already in use" });
+    }
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
 
-        const user = await User.findOne ({ where: { email }});
-        if(!user) return res.status(401).json({ message : "Invalid credentials"});
+export const login = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
 
-        const ok = await bcrypt.compare(password,user.password );
-        if(!ok) return res.status(401).json({ message: "Invlaid credentials"});
-
-        const accessToken = signAccessToken(user.id);
-        const refreshToken = signRefreshToken(user.id);
-
-        const tokenHash = hashToken(refreshToken);
-        const expiresAt = new Date( Date.now() + 7 * 24 * 60 * 60 * 1000);
-        
-        await RefreshToken.create({
-            userId: user.id,
-            tokenHash,
-            expiresAt,
-
-        });
-        
-    return res.json({ accessToken,RefreshToken});
-}
-catch(err) {
-    return res.status(500).json({ message: "Server error"});
-}
+    const tokens = await AuthService.login(email, password);
+    return res.json(tokens);
+  } catch (err: any) {
+    if (err.message === "INVALID_CREDENTIALS") {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+    return res.status(500).json({ message: "Something went wrong" });
+  }
 };
