@@ -16,13 +16,13 @@ export class User
   extends Model<UserAttributes, UserCreationAttributes>
   implements UserAttributes
 {
-  public id!: string;
-  public email!: string;
-  public password!: string;
+  declare id: string;
+declare email: string;
+declare password: string;
 
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
-  public readonly deletedAt!: Date | null;
+declare readonly createdAt: Date;
+declare readonly updatedAt: Date;
+declare readonly deletedAt: Date | null;
 }
 
 User.init(

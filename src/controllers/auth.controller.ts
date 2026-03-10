@@ -25,6 +25,8 @@ export const login = async (req: Request, res: Response) => {
     if (err.message === "INVALID_CREDENTIALS") {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-    return res.status(500).json({ message: "Something went wrong" });
-  }
+
+  console.error(err);
+  return res.status(500).json({ message: "Something went wrong", error: err });
+}  
 };
